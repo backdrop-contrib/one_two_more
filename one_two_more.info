@@ -1,0 +1,6 @@
+name = One, Two, more
+description = Provides a Node reference field formatter.
+package = Fields
+core = 7.x
+dependencies[] = field
+dependencies[] = entityreference
