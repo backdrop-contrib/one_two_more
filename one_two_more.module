@@ -61,6 +61,7 @@ function one_two_more_field_formatter_settings_summary($field, $instance, $view_
  */
 function one_two_more_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $settings = $display['settings'];
+  $element = array();
 
   $output_items = array();
   foreach ($items as $delta => $item) {
@@ -103,7 +104,7 @@ function one_two_more_field_formatter_view($entity_type, $entity, $field, $insta
 
   // More.
   else if (count($items) > 2) {
-    $element = array(array('#markup' => implode(', ', $output_items) . t(' & more')));
+    $element = array(array('#markup' => implode(', ', $output_items) . t(' & !more', array('!more' => l(t('more'), entity_uri($entity->type, $entity))))));
   }
 
   return $element;
