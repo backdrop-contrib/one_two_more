@@ -63,25 +63,31 @@ function one_two_more_field_formatter_view($entity_type, $entity, $field, $insta
   $settings = $display['settings'];
 
   $output_items = array();
-    foreach ($items as $delta => $item) {
+  foreach ($items as $delta => $item) {
     if ($delta < 2) {
       $referenced_entity = reset(entity_load($field['settings']['target_type'], array($item['target_id'])));
-      switch ($field['settings']['target_type']) {
-        case 'node':
-          $label = $referenced_entity->title;
-          break;
-        case 'user':
-          $label = $referenced_entity->name;
-          break;
-      }
-      // If the link is to be displayed and the entity has a uri, display a link.
-      // Note the assignment ($url = ) here is intended to be an assignment.
-      if ($display['settings']['link'] && ($uri = entity_uri($field['settings']['target_type'], $referenced_entity))) {
-        $output_items[] = l($label, $uri['path'], $uri['options']);
-      }
-      else {
-        $output_items[] = check_plain($label);
-      }
+      //if (is_object($referenced_entity)) {
+        switch ($field['settings']['target_type']) {
+          case 'node':
+            $label = $referenced_entity->title;
+            break;
+          case 'user':
+            $label = $referenced_entity->name;
+            break;
+        }
+
+        // If the link is to be displayed and the entity has a uri, display a link.
+        // Note the assignment ($uri = ) here is intended to be an assignment.
+        if ($display['settings']['link']) {
+          $uri = entity_uri($field['settings']['target_type'], $referenced_entity);
+          if ($uri) {
+            $output_items[] = l($label, $uri['path'], $uri['options']);
+          }
+        }
+        else {
+          $output_items[] = check_plain($label);
+        }
+      //}
     }
   }
 
