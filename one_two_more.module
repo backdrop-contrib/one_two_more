@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Provides a Node reference field formatter.
@@ -62,50 +61,55 @@ function one_two_more_field_formatter_settings_summary($field, $instance, $view_
 function one_two_more_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $settings = $display['settings'];
   $element = array();
+  $output = '';
 
   $output_items = array();
   foreach ($items as $delta => $item) {
     if ($delta < 2) {
-      $referenced_entity = reset(entity_load($field['settings']['target_type'], array($item['target_id'])));
-      //if (is_object($referenced_entity)) {
+      $entity_ref = entity_load($field['settings']['target_type'], array($item['target_id']));
+      $referenced_entity = reset($entity_ref);
+      if (is_object($referenced_entity)) {
         switch ($field['settings']['target_type']) {
-          case 'node':
-            $label = $referenced_entity->title;
-            break;
           case 'user':
             $label = $referenced_entity->name;
+            break;
+          default:
+            $label = $referenced_entity->title;
             break;
         }
 
         // If the link is to be displayed and the entity has a uri, display a link.
-        // Note the assignment ($uri = ) here is intended to be an assignment.
         if ($display['settings']['link']) {
-          $uri = entity_uri($field['settings']['target_type'], $referenced_entity);
-          if ($uri) {
+          if ($uri = entity_uri($field['settings']['target_type'], $referenced_entity)) {
             $output_items[] = l($label, $uri['path'], $uri['options']);
           }
         }
         else {
           $output_items[] = check_plain($label);
         }
-      //}
+      }
     }
   }
 
   // One.
   if (count($items) === 1) {
-    $element = array(array('#markup' => reset($output_items)));
+    $output = reset($output_items);
   }
 
   // Two.
   else if (count($items) == 2) {
-    $element = array(array('#markup' => implode(' & ', $output_items)));
+    $output = implode(' & ', $output_items);
   }
 
   // More.
+  else if (count($items) > 2 && (is_object($entity)) && $display['settings']['link']) {
+    $more_link = l(t('more'), entity_uri($entity->type, $entity));
+    $output = implode(', ', $output_items) . t(' & !more', array('!more' => $more_link));
+  }
   else if (count($items) > 2) {
-    $element = array(array('#markup' => implode(', ', $output_items) . t(' & !more', array('!more' => l(t('more'), entity_uri($entity->type, $entity))))));
+    $output = implode(', ', $output_items) . t(' & more');
   }
 
-  return $element;
+  // Return a renderable element.
+  return array(array('#markup' => $output));
 }
