@@ -1,6 +1,8 @@
+type = module
 name = One, Two, more
-description = Provides a Node reference field formatter.
+description = A node reference field formatter to display multiple values.
 package = Fields
-core = 7.x
+backdrop = 1.x
+
 dependencies[] = field
 dependencies[] = entityreference
